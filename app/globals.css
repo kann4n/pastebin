@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+    /* Neobrutalism Color Palette */
+    --neo-pink: #ff90e8;
+    --neo-yellow: #ffc900;
+    --neo-blue: #3b82f6;
+    --neo-green: #4ade80;
+    --neo-orange: #ff5722;
+    --neo-black: #0f0f0f;
+    --neo-white: #ffffff;
+
+    --neo-bg: #fdfbf7;
+
+    --background: var(--neo-bg);
+    --foreground: var(--neo-black);
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-neo-pink: var(--neo-pink);
+    --color-neo-yellow: var(--neo-yellow);
+    --color-neo-blue: var(--neo-blue);
+    --color-neo-green: var(--neo-green);
+    --color-neo-orange: var(--neo-orange);
+    --color-neo-black: var(--neo-black);
+    --color-neo-white: var(--neo-white);
+
+    --font-sans: var(--font-space-grotesk);
+    --font-mono: var(--font-space-mono);
+    --font-gsans: var(--font-geist-sans);
+    --font-gmono: var(--font-geist-mono);
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
