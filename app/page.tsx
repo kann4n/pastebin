@@ -1,6 +1,43 @@
+"use client";
+
 import NeoButton from "@/components/neobutton";
+import { useState } from "react";
 
 export default function Home() {
+    const [content, setContent] = useState("");
+    const [pasteId, setPasteId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.SubmitEvent) => {
+        e.preventDefault();
+        if (!content.trim()) return;
+
+        setIsLoading(true);
+        setPasteId(null);
+
+        try {
+            const response = await fetch("/api/pastes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ content }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setPasteId(data.id);
+                setContent("");
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error("Failed to submit paste", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <main className="max-w-3xl mx-auto p-8 space-y-12 min-h-screen flex flex-col justify-center">
             <header className="flex flex-col items-center space-y-6 text-center">
@@ -12,30 +49,49 @@ export default function Home() {
                 </p>
             </header>
 
-            <form className="flex flex-col space-y-8 pt-4">
+            <form
+                onSubmit={handleSubmit}
+                className="flex flex-col space-y-8 pt-4"
+            >
                 <label htmlFor="paste-content" className="sr-only">
                     Paste content
                 </label>
-                {/*only show when link is available*/}
-                <div className="gap-2 hidden"> 
-                    <p className="text-white">Link:</p>
-                    <a href="" className="text-blue-300 italic" id="linkID"></a>
-                </div>
+
+                {pasteId && (
+                    <div className="gap-2 flex flex-col p-4 border-4 border-neo-black bg-neo-white shadow-[4px_4px_0px_0px_var(--color-neo-black)]">
+                        <p className="text-neo-black font-bold">
+                            Your link is ready:
+                        </p>
+                        <a
+                            href={`/${pasteId}`}
+                            className="text-blue-600 font-bold italic underline"
+                        >
+                            {typeof window !== "undefined"
+                                ? window.location.origin 
+                                : ""}
+                            /{pasteId}
+                        </a>
+                    </div>
+                )}
 
                 <textarea
                     id="paste-content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
                     cols={80}
                     rows={10}
                     className="w-full p-6 border-4 border-neo-black bg-neo-white text-neo-black font-bold text-lg rounded-none outline-none shadow-[8px_8px_0px_0px_var(--color-neo-black)] transition-transform focus:-translate-y-1 focus:-translate-x-1 focus:shadow-[12px_12px_0px_0px_var(--color-neo-black)] resize-y"
                     placeholder="Paste Here..."
+                    required
                 />
 
                 <div className="flex flex-row space-x-6 justify-center">
-                    <NeoButton className="bg-neo-green" type="submit">
-                        Save
-                    </NeoButton>
-                    <NeoButton className="bg-neo-orange" type="button">
-                        Discard
+                    <NeoButton
+                        className="bg-neo-green disabled:opacity-50 disabled:cursor-not-allowed"
+                        type="submit"
+                        disabled={isLoading || !content.trim()}
+                    >
+                        {isLoading ? "Creating..." : "Get Link"}
                     </NeoButton>
                 </div>
             </form>
