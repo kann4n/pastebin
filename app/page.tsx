@@ -2,10 +2,12 @@
 
 import NeoButton from "@/components/neobutton";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
     const [content, setContent] = useState("");
     const [pasteId, setPasteId] = useState<string | null>(null);
+    const [sameID, setSameID] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.SubmitEvent) => {
@@ -14,6 +16,7 @@ export default function Home() {
 
         setIsLoading(true);
         setPasteId(null);
+        setSameID(false);
 
         try {
             const response = await fetch("/api/pastes", {
@@ -29,6 +32,8 @@ export default function Home() {
             if (data.success) {
                 setPasteId(data.id);
                 setContent("");
+            } else if (response.status === 409 || data.status === 409) {
+                setSameID(true);
             } else {
                 console.error(data.error);
             }
@@ -38,6 +43,7 @@ export default function Home() {
             setIsLoading(false);
         }
     };
+    
     return (
         <main className="max-w-3xl mx-auto p-8 space-y-12 min-h-screen flex flex-col justify-center">
             <header className="flex flex-col items-center space-y-6 text-center">
@@ -47,6 +53,12 @@ export default function Home() {
                 <p className="text-lg font-gmono text-neo-black bg-neo-pink border-4 border-neo-black inline-block px-6 py-2 shadow-[4px_4px_0px_0px_var(--color-neo-black)] rotate-1">
                     A tool for sharing some text...
                 </p>
+
+                <div className="flex">
+                    <Link href="/all" className="text-neo-white text-sm hover:underline">
+                        #all
+                    </Link>
+                </div>
             </header>
 
             <form
@@ -62,7 +74,7 @@ export default function Home() {
                         <p className="text-neo-black font-bold">
                             Your link is ready:
                         </p>
-                        <a
+                        <Link
                             href={`/${pasteId}`}
                             className="text-blue-600 font-bold italic underline"
                         >
@@ -70,8 +82,13 @@ export default function Home() {
                                 ? window.location.origin 
                                 : ""}
                             /{pasteId}
-                        </a>
+                        </Link>
                     </div>
+                )}
+                
+                {sameID && (
+                    <p className="text-neo-yellow font-bold bg-neo-black p-2">
+                        Oops, bad luck! We generated an ID that&apos;s already taken. Smash that button again for a new one                    </p>
                 )}
 
                 <textarea
