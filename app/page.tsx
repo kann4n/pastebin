@@ -55,7 +55,7 @@ export default function Home() {
                 </p>
 
                 <div className="flex">
-                    <Link href="/all" className="text-neo-white text-sm hover:underline">
+                    <Link href="/all" className="text-neo-white text-sm hover:underline p-1">
                         #all
                     </Link>
                 </div>
